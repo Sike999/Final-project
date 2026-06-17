@@ -1,0 +1,138 @@
+datasource db {
+    provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+    admin
+    listener
+    artist
+}
+
+model User {
+    id Int @id @default(autoincrement())
+    email String @unique @db.VarChar(150)
+    passwordHash String @db.VarChar(350) @map("password_hash")
+    name String @db.VarChar(150)
+    nickname String @unique @db.VarChar(150)
+    role Role @default(listener)
+    profileCoverUrl String? @db.VarChar(550) @map("profile_cover_url")
+    avatarUrl String? @db.VarChar(550) @map("avatar_url")
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+    @@map("users")
+
+    tracks Track[]
+    playlists Playlist[]
+    likes Likes[]
+    syncRooms SyncRoom[]
+    listeningHistory ListeningHistory[]
+    participants Participant[]
+}
+
+model Track {
+    id Int @id @default(autoincrement())
+    uploadedById Int @map("uploaded_by_id")
+    title String @db.VarChar(150)
+    genre String @db.VarChar(100)
+    duration Int 
+    fileKey String @db.VarChar(150) @map("file_key")
+    coverUrl String? @db.VarChar(550) @map("cover_url")
+    waveform Json 
+    playCount Int @map("play_count")
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    @@map("tracks")
+
+    uploadedBy User @relation(fields: [uploadedById], references: [id])
+    playlists PlaylistOnTracks[]
+    likes Likes[]
+    listeningHistory ListeningHistory[]
+    syncRooms SyncRoom[]
+}
+
+model Playlist {
+    id Int @id @default(autoincrement())
+    userId Int @map("user_id") 
+    name String @db.VarChar(150)
+    description String? @db.VarChar(550)
+    isPublic Boolean @default(false) @map("is_public")
+    coverUrl String? @db.VarChar(550) @map("cover_url")
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    @@map("playlists")
+
+    user User @relation(fields: [userId], references: [id])
+    tracks PlaylistOnTracks[]
+}
+
+model PlaylistOnTracks {
+    playlistId Int @map("playlist_id")
+    trackId Int @map("track_id")
+    order Int 
+
+    playlist Playlist @relation(fields: [playlistId], references: [id])
+    track Track @relation(fields: [trackId], references: [id])
+    @@id([playlistId,trackId])
+    @@map("playlist_on_tracks")
+}
+
+model Likes {
+    userId Int @map("user_id")
+    trackId Int @map("track_id")
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    user User @relation(fields: [userId], references: [id])
+    track Track @relation(fields: [trackId], references: [id])
+
+    @@id([userId,trackId])
+    @@map("likes")
+}
+
+model SyncRoom {
+    id Int @id @default(autoincrement())
+    currentTrackId Int @map("current_track_id")
+    name String @db.VarChar(150)
+    currentTime Int @map("current_time")
+    isPlaying Boolean @default(false) @map("is_playing")
+    leaderId Int @map("leader_id")
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    track Track @relation(fields: [currentTrackId], references: [id])
+    leader User @relation(fields: [leaderId], references: [id])
+    participants Participant[]
+
+    @@map("sync_rooms")
+}
+
+model Participant {
+    roomId Int @map("room_id")
+    userId Int @map("user_id")
+    joinedAt  DateTime @default(now()) @map("joined_at")
+
+    syncRoom SyncRoom @relation(fields: [roomId], references: [id])
+    user User @relation(fields: [userId], references: [id])
+    @@id([roomId, userId])
+
+    @@map("participants")
+}
+
+model ListeningHistory {
+    id Int @id @default(autoincrement())
+    userId Int @map("user_id")
+    trackId Int @map("track_id")
+    listenedAt DateTime @default(now()) @map("listened_at")
+    progress Int 
+
+    user      User     @relation(fields: [userId], references: [id])
+    track     Track    @relation(fields: [trackId], references: [id])
+
+    @@index([userId])
+    @@index([trackId])
+    @@index([listenedAt])
+    @@map("listening_history")
+}

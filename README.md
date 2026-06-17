@@ -48,15 +48,14 @@
 ## Сущности системы
 | Сущность | Что можно делать |
 |-------|------------------|
-| Users | id, email, passwordHash, name, avatarUrl, createdAt, updatedAt |
-| Track | id, uploadedById, title, artist, genre, duration, fileKey, coverUrl, waveform, playCount, createdAt |
+| User | id, email, passwordHash, role, profileCoverUrl, name, nickname, avatarUrl, createdAt, updatedAt |
+| Track | id, uploadedById, title, genre, duration, fileKey, coverUrl, waveform, playCount, createdAt |
 | Playlist  | id, name, description, isPublic, coverUrl, userId, createdAt |
 | PlaylistOnTracks | playlistId, trackId, order |
 | Likes | userId, trackId, createdAt |
-| SyncRoom | id, playlistId, currentTrackId, currentTime, isPlaying, leaderId, createdAt |
-| Participant | id, roomId, userId, joinedAt |
+| SyncRoom | id, name, currentTrackId, currentTime, isPlaying, leaderId, createdAt |
+| Participant | roomId, userId, joinedAt |
 | ListeningHistory  | id, userId, trackId, listenedAt, progress |
-| RadioStation | id, userId, genre, name, lastPlayed |
 
 ## ER-диаграмма
 [Диаграмма](./ER-диаграмма.drawio.svg)
