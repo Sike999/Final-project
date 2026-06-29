@@ -10,6 +10,10 @@
     @apply font-light bg-none border-white border-1 text-white py-[8px] flex justify-around items-center text-[18px];  
     font-family: Roboto
   }
+  .contextMenu {
+    @apply font-light bg-none text-white flex justify-around items-center text-[18px];  
+    font-family: Roboto
+  }
   .clickableSize30 {
     @apply hover:cursor-pointer
     

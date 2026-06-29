@@ -16,7 +16,7 @@ export default function Footer() {
         <footer className="w-full h-[800px] bg-black relative" >
 
             <img src="/arts/vynyl.png" className="absolute left-[30%] z-10" draggable="false"/>
-            <img src="/arts/logoMirrored.png" className="absolute left-[15%] top-[33.5%] z-11" draggable="false"/>
+            <img src="/arts/logoMirrored.png" className="absolute left-[15.1%] top-[33.5%] z-11" draggable="false"/>
 
             <div className="relative z-20 flex flex-col text-white h-full">
 
@@ -46,7 +46,9 @@ export default function Footer() {
                 </div>
             </div>
             {show && (
-                <Tooltip text="Copied!" parentRef={parentRef} show={show} setShow={setShow}/>
+                <Tooltip tailwindStyles="bg-[#171717] w-[120px] h-[30px] border-1 border-[#3b3a3a] rounded-[40px] text-white flex items-center justify-center absolute bottom-12" parentRef={parentRef} show={show} setShow={setShow}>
+                    <p>Copied!</p>
+                </Tooltip>
             )}
         </footer>
     )

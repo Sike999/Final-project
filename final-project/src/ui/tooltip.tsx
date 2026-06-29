@@ -1,8 +1,8 @@
 import { createPortal } from "react-dom";
-import { useEffect, useRef, type RefObject } from 'react';
-export default function Tooltip({ show, setShow, text, parentRef } : { show:boolean, text:string, setShow:React.Dispatch<React.SetStateAction<boolean>>, parentRef:RefObject}) {
+import { useEffect, useRef, type ReactElement } from 'react';
+export default function Tooltip({ show, setShow, parentRef, tailwindStyles, children } : { children:ReactElement, tailwindStyles:string, show:boolean, setShow:React.Dispatch<React.SetStateAction<boolean>>, parentRef:React.RefObject<HTMLElement>}) {
 
-    const timerRef = useRef<number | null>(null)
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     useEffect(() => {
         if (show === false) return
         if(timerRef.current) clearTimeout(timerRef.current)
@@ -19,8 +19,8 @@ export default function Tooltip({ show, setShow, text, parentRef } : { show:bool
         return null;
     }
     return createPortal(
-        <div className="bg-[#171717] w-[120px] h-[30px] border-1 border-[#3b3a3a] rounded-[40px] text-white flex items-center justify-center absolute bottom-12">
-            <p>{text}</p>
+        <div className={tailwindStyles}>
+            {children}
         </div>,
         parentRef.current
     );

@@ -17,7 +17,7 @@ model User {
     email String @unique @db.VarChar(150)
     passwordHash String @db.VarChar(350) @map("password_hash")
     name String @db.VarChar(150)
-    nickname String @unique @db.VarChar(150)
+    nickname String? @unique @db.VarChar(150)
     role Role @default(listener)
     profileCoverUrl String? @db.VarChar(550) @map("profile_cover_url")
     avatarUrl String? @db.VarChar(550) @map("avatar_url")
@@ -148,7 +148,8 @@ model GenreImages {
 model UserRefreshTokens {
     id Int @id @default(autoincrement())
     userId Int @map("user_id")
-    token Json 
+    token String 
+    expiresAt DateTime @map("expires_at")
     user User @relation(fields: [userId], references: [id])
     @@map("user_refresh_token")
 }
