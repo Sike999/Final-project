@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
+    "types":["node"],
     "sourceMap": true,    
     "target": "esnext",
     "module": "nodenext",

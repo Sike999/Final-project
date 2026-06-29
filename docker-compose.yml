@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # ====== БАЗА ДАННЫХ ======
+  postgres:
+    image: postgres:16-alpine
+    container_name: wavy-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: wavy
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - streaming
+
+  # ====== MINIO ======
+  minio:
+    image: minio/minio:latest
+    container_name: wavy-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Web-консоль
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - streaming
+
+  # ====== БЭКЕНД ======
+  backend:
+    build:
+      context: ./music-streaming-backend
+      dockerfile: Dockerfile
+    container_name: wavy-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:admin@localhost:5432/wavy?schema=public
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./music-streaming-backend/src:/app/src
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: npm start
+    restart: unless-stopped
+  networks:
+      - streaming
+
+  # ====== ФРОНТЕНД ======
+  frontend:
+    build:
+      context: ./final-project
+      dockerfile: Dockerfile
+    container_name: wavy-frontend
+    environment:
+      VITE_API_URL: http://host.docker.internal:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./final-project:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: npm run dev -- --host
+    restart: unless-stopped
+    networks:
+      - streaming
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  streaming:

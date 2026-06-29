@@ -56,6 +56,7 @@
 | SyncRoom | id, name, currentTrackId, currentTime, isPlaying, leaderId, createdAt |
 | Participant | roomId, userId, joinedAt |
 | ListeningHistory  | id, userId, trackId, listenedAt, progress |
+| GenreImages | id, url, genre |
 
 ## ER-диаграмма
 [Диаграмма](./ER-диаграмма.drawio.svg)
